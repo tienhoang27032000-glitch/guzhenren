@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vạn Cổ Tiên Đồ - Tu Tiên Luyện Cổ Vượt Ải (Chuẩn Nguyên Tác Cổ Chân Nhân)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Input ẩn dùng chung cho chức năng Nhập File Lưu (.json) -->
+    <input type="file" id="save-file-input" accept=".json,application/json" class="hidden">
+
+    <!-- =================================================================
+         MÀN HÌNH 1: KHỞI TẠO NHÂN VẬT, SKIN, NGŨ VỰC, THẾ LỰC & KHAI KHIẾU
+    ================================================================== -->
+    <div id="character-creation-screen" class="screen active">
+        <div class="creation-wrapper">
+            <div class="creation-header">
+                <h1 class="game-title">VẠN CỔ TIÊN ĐỒ</h1>
+                <p class="game-subtitle">Người là vạn vật chi linh, Cổ là thiên địa chân tinh</p>
+            </div>
+
+            <!-- Bước 1: Chọn Tên, Ngoại Hình (Skin), Ngũ Vực & Thế Lực Xuất Thân -->
+            <div id="creation-step-form" class="creation-panel">
+                <h2>Khởi Tạo Thân Phận & Diện Mạo Cổ Sư</h2>
+
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label for="player-name">Đạo Hiệu / Họ Tên:</label>
+                        <input type="text" id="player-name" maxlength="24" placeholder="Nhập tên nhân vật..." value="Cổ Nguyệt Phương Nguyên">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="region-select">Chọn Xuất Thân Ngũ Vực:</label>
+                        <select id="region-select">
+                            <option value="nam_cuong">Nam Cương (Vạn đại sơn trại, giàu Độc/Mộc/Lực Đạo)</option>
+                            <option value="bac_nguyen">Bắc Nguyên (Thảo nguyên hoàng kim, mạnh Nô/Lực/Phong Đạo)</option>
+                            <option value="trung_chau">Trung Châu (Thập đại cổ phái, tinh thông Kiếm/Trí/Luyện Đạo)</option>
+                            <option value="dong_hai">Đông Hải (Vạn đảo linh uyên, dồi dào Thủy/Trí/Vận Đạo)</option>
+                            <option value="tay_mac">Tây Mạc (Sa mạc ốc đảo, bá chủ Viêm/Thổ/Thương Đội)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Chọn Skin Nhân Vật kèm Khung Xem Trước Pixel Art -->
+                <div class="skin-selection-box">
+                    <div class="skin-preview-frame">
+                        <canvas id="creationSkinPreviewCanvas" width="88" height="88"></canvas>
+                        <span class="sub-text">Ngoại hình</span>
+                    </div>
+                    <div class="skin-select-controls">
+                        <div class="form-group" style="margin-bottom: 6px;">
+                            <label for="skin-select">Chọn Ngoại Hình / Skin Nhân Vật:</label>
+                            <select id="skin-select">
+                                <option value="phuong_nguyen">Cổ Nguyệt Phương Nguyên (Hắc Bào Mặc Phát — Cổ Nguyệt Ma Ảnh)</option>
+                                <option value="bach_ngung_bang">Bạch Ngưng Băng (Bạch Y Ngân Phát — Bắc Minh Hàn Phách)</option>
+                                <option value="phuong_cuu_ca">Phượng Cửu Ca (Hồng Bạch Cẩm Bào — Trung Châu Đệ Nhất Nhân)</option>
+                                <option value="thuong_tam_tu">Thương Tâm Từ (Bích Lục Thục Nữ — Thương Gia Nhân Từ)</option>
+                                <option value="hac_lau_lan">Hắc Lâu Lan (Huyền Kim Bá Giáp — Đại Lực Chân Vũ)</option>
+                                <option value="hong_lien">Hồng Liên Ma Tôn (Huyết Hồng Tiên Bào — Quang Âm Chi Chủ)</option>
+                                <option value="u_hon">U Hồn Ma Tôn (U Minh Ám Ảnh — Sát Tính Thao Thiên)</option>
+                                <option value="tinh_tu">Tinh Tú Tiên Tôn (Tinh Lam Tiên Y — Thiên Đình Chi Chủ)</option>
+                            </select>
+                        </div>
+                        <p id="skin-description-text" class="sub-text">
+                            Trường bào đen tuyền, tóc đen dài xõa vai, đôi mắt sâu thẳm như cổ đàm không gợn sóng.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="faction-origin-select">Chọn Thế Lực & Gia Thế Khởi Đầu:</label>
+                    <select id="faction-origin-select">
+                        <option value="righteous_clan">Đệ Tử Gia Tộc Chính Đạo (60 Nguyên Thạch, 100 Điểm Cống Hiến, tặng 1 Thanh Đồng Xá Lợi Cổ)</option>
+                        <option value="central_sect">Đệ Tử Môn Phái Trung Châu (50 Nguyên Thạch, có sẵn Cổ Phương Nhị Chuyển, +10 Đạo Ngân Kiếm Đạo)</option>
+                        <option value="lone_cultivator">Tán Tu Sơn Dã (30 Nguyên Thạch, nhiều cổ tài thức ăn, +15% tỷ lệ bắt Cổ Hoang Dã)</option>
+                        <option value="demonic_inheritor">Truyền Nhân Ma Đạo Bí Ẩn (25 Nguyên Thạch, sở hữu Huyết Đạo Cổ Trùng, sát lực cao)</option>
+                        <option value="merchant_heir">Thiếu Đông Gia Thương Đội (120 Nguyên Thạch, giảm 15% giá mua hàng tại Thương Hội)</option>
+                    </select>
+                </div>
+
+                <div class="origin-preview" id="origin-description-box">
+                    <p><strong>Bối cảnh:</strong> Sinh ra trong một gia tộc Chính Đạo trên đỉnh Thanh Mao Sơn thuộc Nam Cương. Hôm nay là ngày tổ chức Khai Khiếu Đại Điển, quyết định tiền đồ tu luyện cả đời.</p>
+                </div>
+
+                <div class="creation-actions">
+                    <button id="btn-import-file-start" class="btn-accent" title="Tải file lưu .json từ máy tính">📂 Nhập File Lưu (.json)</button>
+                    <button id="btn-load-existing" class="btn-secondary">Đọc Lưu Trữ Trình Duyệt</button>
+                    <button id="btn-start-ritual" class="btn-primary">Bước Vào Khai Khiếu Đại Điển</button>
+                </div>
+            </div>
+
+            <!-- Bước 2: Nghi Thức Khai Khiếu 7 Bước -->
+            <div id="creation-step-ritual" class="creation-panel hidden">
+                <h2>Nghi Thức Khai Khiếu — Dòng Sông Hy Vọng</h2>
+
+                <div class="ritual-visual-box">
+                    <canvas id="ritualCanvas" width="420" height="210"></canvas>
+                    <div id="ritual-step-indicator" class="ritual-step-badge">Bước 1/7: Bước xuống dòng suối Hy Vọng Cổ</div>
+                </div>
+
+                <div id="ritual-narrative-log" class="ritual-log"></div>
+
+                <!-- Kết quả Tư Chất & Cổ Bản Mệnh -->
+                <div id="aptitude-result-box" class="aptitude-result hidden">
+                    <div class="aptitude-row">
+                        <span>Tư chất Không Khiếu:</span>
+                        <strong id="result-aptitude-grade" class="highlight-gold">---</strong>
+                    </div>
+                    <div class="aptitude-row">
+                        <span>Dung lượng Biển Nguyên tối đa:</span>
+                        <strong id="result-sea-capacity">---</strong>
+                    </div>
+                    <div class="aptitude-row">
+                        <span>Tốc độ hồi phục Chân Nguyên:</span>
+                        <strong id="result-regen-rate">---</strong>
+                    </div>
+                    <div class="aptitude-row">
+                        <span>Cảnh giới khởi đầu:</span>
+                        <strong id="result-initial-realm">Nhất Chuyển Sơ Giai (Thanh Đồng Chân Nguyên)</strong>
+                    </div>
+                    <div class="aptitude-row">
+                        <span>Cổ Bản Mệnh luyện hóa đầu tiên:</span>
+                        <strong id="result-vital-gu">---</strong>
+                    </div>
+                </div>
+
+                <div class="creation-actions">
+                    <button id="btn-next-ritual-step" class="btn-primary">Tiếp Tục Khai Khiếu</button>
+                    <button id="btn-enter-hub" class="btn-primary hidden">Tiến Vào Động Phủ / Đại Bản Doanh</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =================================================================
+         MÀN HÌNH 2: MENU CHÍNH NGOÀI TRẬN — ĐẠI BẢN DOANH (HUB SCREEN)
+    ================================================================== -->
+    <div id="hub-screen" class="screen">
+        <!-- THANH TRẠNG THÁI TỔNG QUAN TRÊN CÙNG (TOP HEADER BAR) -->
+        <header class="hub-topbar">
+            <div class="topbar-identity">
+                <div class="avatar-badge" id="hub-avatar-icon" title="Nhấn vào Không Khiếu để đổi Skin Nhân Vật">
+                    <canvas id="hubTopAvatarCanvas" width="48" height="48"></canvas>
+                </div>
+                <div>
+                    <h2 id="hub-player-name">Phương Nguyên</h2>
+                    <div class="identity-sub">
+                        <span id="hub-region-badge" class="badge">Nam Cương</span>
+                        <span id="hub-faction-badge" class="badge">Chính Đạo Gia Tộc</span>
+                        <span id="hub-aptitude-badge" class="badge highlight-gold">Ất Đẳng (72%)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cảnh giới & Thanh Tiến Độ Khiếu Bích / Biển Nguyên -->
+            <div class="topbar-bars">
+                <div class="bar-block">
+                    <div class="bar-label">
+                        <strong id="hub-realm-name" style="color:#5cc995;">Nhất Chuyển Sơ Giai</strong>
+                        <span id="hub-wall-type" class="sub-text">Khiếu bích: Khinh Mạc</span>
+                    </div>
+                    <div class="progress-track">
+                        <div id="hub-cultivate-fill" class="progress-fill cultivation-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="bar-meta">
+                        <span>Ôn dưỡng Khiếu: <strong id="hub-cultivate-text">0 / 450</strong></span>
+                        <span>Áp lực khiếu: <strong id="hub-pressure-text">5%</strong></span>
+                    </div>
+                </div>
+
+                <div class="bar-block">
+                    <div class="bar-label">
+                        <span id="hub-essence-title">Thanh Đồng Chân Nguyên</span>
+                        <span id="hub-essence-text">72% / 72%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div id="hub-essence-cap-marker" class="essence-cap-marker" style="left: 72%;"></div>
+                        <div id="hub-essence-fill" class="progress-fill essence-rank-1" style="width: 72%;"></div>
+                    </div>
+                    <div class="bar-meta">
+                        <span>Sinh Mệnh: <strong id="hub-hp-text">100/100</strong></span>
+                        <span>Tinh Thần: <strong id="hub-mental-text">100/100</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tài nguyên trọng yếu -->
+            <div class="topbar-currencies">
+                <div class="currency-item" title="Nguyên Thạch: Tiền tệ phàm nhân & khôi phục Chân Nguyên">
+                    <span>💎 Nguyên Thạch:</span>
+                    <strong id="hub-stones-count">60</strong>
+                </div>
+                <div class="currency-item" title="Điểm Cống Hiến Thế Lực: Dùng đổi Cổ Trùng & Cổ Phương trong Gia Tộc Khố Phòng">
+                    <span>🏅 Cống Hiến:</span>
+                    <strong id="hub-merit-count">100</strong>
+                </div>
+                <div class="currency-item" title="Nhân Khí tích lũy: Yếu tố sống còn khi Phá Khiếu Thăng Tiên">
+                    <span>☯ Nhân Khí:</span>
+                    <strong id="hub-human-qi-count">20</strong>
+                </div>
+                <div class="currency-item" title="Tiên Nguyên Thạch: Tiền tệ giao dịch tại Bảo Hoàng Thiên">
+                    <span>🌟 Tiên Thạch:</span>
+                    <strong id="hub-immortal-stones-count">0</strong>
+                </div>
+            </div>
+        </header>
+
+        <!-- KHUNG CHÍNH: CỘT MENU TRÁI (10 MỤC) + VÙNG NỘI DUNG GIỮA (CUỘN MƯỢT) + NHẬT KÝ PHẢI -->
+        <div class="hub-main-layout">
+
+            <!-- CỘT TRÁI: MENU ĐIỀU HƯỚNG 10 HỆ THỐNG LỚN -->
+            <nav class="hub-sidebar">
+                <div class="sidebar-group-title">CHINH PHẠT & TU LUYỆN</div>
+                <button class="nav-btn active" data-tab="tab-maps">
+                    <span class="nav-icon">🗺️</span>
+                    <div>
+                        <strong>Bản Đồ Lịch Luyện</strong>
+                        <small>25 Bí cảnh từ 1 đến 9 Chuyển</small>
+                    </div>
+                </button>
+                <button class="nav-btn" data-tab="tab-aperture">
+                    <span class="nav-icon">☯️</span>
+                    <div>
+                        <strong>Không Khiếu & Ngoại Hình</strong>
+                        <small>Tu luyện, Xá lợi, Đổi Skin</small>
+                    </div>
+                </button>
+                <button class="nav-btn" data-tab="tab-gu-storage">
+                    <span class="nav-icon">🪲</span>
+                    <div>
+                        <strong>Kho Cổ & Thăng Chuyển</strong>
+                        <small>Thăng Chuyển 1–9 & Lắp 8 ô</small>
+                    </div>
+                </button>
+
+                <div class="sidebar-group-title">LUYỆN ĐẠO & SÁT CHIÊU</div>
+                <button class="nav-btn" data-tab="tab-refinement">
+                    <span class="nav-icon">⚗️</span>
+                    <div>
+                        <strong>Luyện Đạo Các</strong>
+                        <small>Luyện hóa & Hợp luyện cổ</small>
+                    </div>
+                </button>
+                <button class="nav-btn" data-tab="tab-killer-moves">
+                    <span class="nav-icon">⚡</span>
+                    <div>
+                        <strong>Thiên Cơ Sát Chiêu</strong>
+                        <small>Phối hợp cổ trùng Z, X, C, V</small>
+                    </div>
+                </button>
+                <button class="nav-btn" data-tab="tab-dao-attainment">
+                    <span class="nav-icon">🌌</span>
+                    <div>
+                        <strong>Đạo Ngân & Mộng Cảnh</strong>
+                        <small>21 Lưu phái & Thăm dò Mộng cảnh</small>
+                    </div>
+                </button>
+
+                <div class="sidebar-group-title">KINH TẾ & THẾ LỰC</div>
+                <button class="nav-btn" data-tab="tab-inventory">
+                    <span class="nav-icon">🎒</span>
+                    <div>
+                        <strong>Hành Trang & Cổ Tài</strong>
+                        <small>Vật phẩm, Xá lợi, Thảo dược</small>
+                    </div>
+                </button>
+                <button class="nav-btn" data-tab="tab-market">
+                    <span class="nav-icon">⚖️</span>
+                    <div>
+                        <strong>Thương Hội & Bảo Hoàng Thiên</strong>
+                        <small>Chợ thương đội & Giao dịch Tiên</small>
+                    </div>
+                </button>
+                <button class="nav-btn" data-tab="tab-faction">
+                    <span class="nav-icon">🏯</span>
+                    <div>
+                        <strong>Thế Lực & Chân Truyền</strong>
+                        <small>Nhiệm vụ, Khố phòng, Truyền thừa</small>
+                    </div>
+                </button>
+                <button class="nav-btn" data-tab="tab-settings">
+                    <span class="nav-icon">💾</span>
+                    <div>
+                        <strong>Lưu Trữ & Xuất/Nhập File</strong>
+                        <small>Save/Load & Xuất file .json</small>
+                    </div>
+                </button>
+            </nav>
+
+            <!-- VÙNG NỘI DUNG TRUNG TÂM (CUỘN/LƯỚT XUỐNG TỰ DO) -->
+            <main class="hub-content-area">
+
+                <!-- =========================================================
+                     TAB 1: BẢN ĐỒ LỊCH LUYỆN — 25 BẢN ĐỒ (1 -> 9 CHUYỂN TÔN GIẢ)
+                ========================================================== -->
+                <section id="tab-maps" class="hub-tab-panel active">
+                    <div class="panel-header">
+                        <div>
+                            <h2>🗺️ Bản Đồ Lịch Luyện, Phúc Địa & Tầng Chín Phong Ma Quật (1 → 9 Chuyển)</h2>
+                            <p class="sub-text">Chiến trường mở rộng 4800×4800px với Quái, Tinh Anh, Á Tiên Tôn và trận quyết chiến Song Tôn Cửu Chuyển tại Phong Ma Quật.</p>
+                        </div>
+                        <div class="filter-tabs" id="map-rank-filter">
+                            <button class="tab-btn active" data-mfilter="all">Tất Cả (25 Bản Đồ)</button>
+                            <button class="tab-btn" data-mfilter="1">Nhất Chuyển</button>
+                            <button class="tab-btn" data-mfilter="2">Nhị Chuyển</button>
+                            <button class="tab-btn" data-mfilter="3">Tam Chuyển</button>
+                            <button class="tab-btn" data-mfilter="4">Tứ Chuyển</button>
+                            <button class="tab-btn" data-mfilter="5">Ngũ Chuyển</button>
+                            <button class="tab-btn" data-mfilter="6">Lục Chuyển (Tiên)</button>
+                            <button class="tab-btn" data-mfilter="7">Thất Chuyển (Tiên)</button>
+                            <button class="tab-btn" data-mfilter="8">Bát Chuyển (Tiên)</button>
+                            <button class="tab-btn" data-mfilter="9">Cửu Chuyển (Tôn Giả)</button>
+                        </div>
+                    </div>
+
+                    <div id="stage-maps-grid" class="maps-grid">
+                        <!-- Được render động bởi GameEngine / UIManager -->
+                    </div>
+                </section>
+
+                <!-- =========================================================
+                     TAB 2: NỘI THỊ KHÔNG KHIẾU, ĐỔI SKIN & THĂNG TIÊN
+                ========================================================== -->
+                <section id="tab-aperture" class="hub-tab-panel hidden">
+                    <div class="panel-header">
+                        <h2>☯️ Nội Thị Không Khiếu — Tu Luyện, Đổi Ngoại Hình & Tiên Khiếu</h2>
+                        <p class="sub-text">Vận chuyển Chân Nguyên cọ rửa Khiếu Bích, sử dụng Xá Lợi Cổ, thay đổi diện mạo nhân vật hoặc quản lý Phúc Địa.</p>
+                    </div>
+
+                    <div class="split-2">
+                        <!-- Cột Trái: Trực quan Không Khiếu & Các nút Tu luyện -->
+                        <div class="card-box">
+                            <h3>Không Gian Khiếu & Biển Nguyên</h3>
+                            <canvas id="apertureVisualCanvas" width="340" height="220"></canvas>
+
+                            <div class="info-list">
+                                <div class="info-row"><span>Loại Không Khiếu:</span> <strong id="ap-type-text">Phàm Khiếu</strong></div>
+                                <div class="info-row"><span>Cảnh giới hiện tại:</span> <strong id="ap-realm-text" class="highlight-gold">Nhất Chuyển Sơ Giai</strong></div>
+                                <div class="info-row"><span>Trạng thái Khiếu Bích:</span> <strong id="ap-wall-text">Khinh Mạc (Màng Ánh Sáng)</strong></div>
+                                <div class="info-row"><span>Phẩm chất Chân Nguyên:</span> <strong id="ap-essence-name">Thanh Đồng Chân Nguyên</strong></div>
+                                <div class="info-row"><span>Cổ Bản Mệnh trấn khiếu:</span> <strong id="ap-vital-gu-name">Nguyệt Quang Cổ</strong></div>
+                            </div>
+
+                            <div class="action-stack mt-15">
+                                <button id="btn-hub-cultivate" class="btn-primary">🧘 Vận Chuyển Chân Nguyên Ôn Dưỡng Khiếu Bích (-12.5% Chân Nguyên)</button>
+                                <button id="btn-hub-absorb-stone" class="btn-secondary">💎 Hấp Thu 1 Nguyên Thạch Hồi Nhanh Chân Nguyên</button>
+                                <button id="btn-hub-use-relic" class="btn-accent">✨ Sử Dụng Xá Lợi Cổ (Đột Phá Nhanh Tiểu Cảnh Giới)</button>
+                                <button id="btn-hub-breakthrough" class="btn-primary" disabled>⚡ Xung Kích Đột Phá Cảnh Giới Tiếp Theo</button>
+                                <button id="btn-hub-ascend" class="btn-danger hidden">🌌 Phá Khiếu Thăng Tiên (Tam Khí Hợp Nhất)</button>
+                            </div>
+                        </div>
+
+                        <!-- Cột Phải: Đổi Skin Nhân Vật, Chỉ Số Chiến Đấu & Quản lý Tiên Khiếu -->
+                        <div class="card-box">
+                            <h3>🎭 Diện Mạo & Pháp Y Nhân Vật (Skin)</h3>
+                            <div class="skin-selection-box" style="margin-bottom: 14px;">
+                                <div class="skin-preview-frame">
+                                    <canvas id="hubSkinPreviewCanvas" width="80" height="80"></canvas>
+                                </div>
+                                <div class="skin-select-controls">
+                                    <select id="hub-skin-select">
+                                        <option value="phuong_nguyen">Cổ Nguyệt Phương Nguyên (Hắc Bào Mặc Phát)</option>
+                                        <option value="bach_ngung_bang">Bạch Ngưng Băng (Bạch Y Ngân Phát)</option>
+                                        <option value="phuong_cuu_ca">Phượng Cửu Ca (Hồng Bạch Cẩm Bào)</option>
+                                        <option value="thuong_tam_tu">Thương Tâm Từ (Bích Lục Tiên Quần)</option>
+                                        <option value="hac_lau_lan">Hắc Lâu Lan (Huyền Kim Bá Giáp)</option>
+                                        <option value="hong_lien">Hồng Liên Ma Tôn (Huyết Hồng Tiên Bào)</option>
+                                        <option value="u_hon">U Hồn Ma Tôn (U Minh Ma Ảnh)</option>
+                                        <option value="tinh_tu">Tinh Tú Tiên Tôn (Tinh Lam Tiên Y)</option>
+                                    </select>
+                                    <p id="hub-skin-desc" class="sub-text mt-5">Có thể thay đổi diện mạo bất kỳ lúc nào trước khi vào Bản Đồ.</p>
+                                </div>
+                            </div>
+
+                            <h3>Chỉ Số Chiến Đấu Hiện Tại</h3>
+                            <div class="stat-grid">
+                                <div class="stat-item"><span>Sinh Mệnh tối đa:</span> <strong id="stat-hp">100 / 100</strong></div>
+                                <div class="stat-item"><span>Công Kích cơ bản:</span> <strong id="stat-atk">12</strong></div>
+                                <div class="stat-item"><span>Phòng Ngự cơ bản:</span> <strong id="stat-def">5</strong></div>
+                                <div class="stat-item"><span>Tốc Độ thân pháp:</span> <strong id="stat-spd">135</strong></div>
+                                <div class="stat-item"><span>Tinh Thần Lực:</span> <strong id="stat-mental">100 / 100</strong></div>
+                                <div class="stat-item"><span>Danh vọng Chính/Ma:</span> <strong id="stat-alignment">Chính Đạo (+20)</strong></div>
+                            </div>
+
+                            <h3 class="mt-15">Phúc Địa / Động Thiên (Dành cho Cổ Tiên Lục Chuyển+)</h3>
+                            <canvas id="immortalApertureCanvas" width="340" height="175"></canvas>
+                            <div id="immortal-aperture-controls" class="action-row mt-10">
+                                <button id="btn-collect-aperture-yield" class="btn-secondary">Thu Hoạch Sản Vật Tiên Khiếu</button>
+                                <button id="btn-trigger-tribulation" class="btn-danger">Chủ Động Độ Tai Kiếp</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =========================================================
+                     TAB 3: KHO CỔ TRÙNG, THĂNG CHUYỂN & LẮP 8 Ô CHIẾN ĐẤU
+                ========================================================== -->
+                <section id="tab-gu-storage" class="hub-tab-panel hidden">
+                    <div class="panel-header">
+                        <div>
+                            <h2>🪲 Kho Cổ Trùng, Thăng Chuyển (1 → 9) & Thực Đơn Nuôi Dưỡng</h2>
+                            <p class="sub-text">Mỗi Cổ Trùng có cấp Chuyển từ 1 đến 9 (Phàm Cổ tối đa 5 Chuyển, Tiên Cổ từ 6–9 Chuyển, Linh Cổ thăng từ 1–9 Chuyển).</p>
+                        </div>
+                        <div class="filter-tabs" id="gu-filter-tabs">
+                            <button class="tab-btn active" data-filter="all">Tất Cả</button>
+                            <button class="tab-btn" data-filter="rank-1">Nhất Chuyển</button>
+                            <button class="tab-btn" data-filter="rank-2">Nhị Chuyển</button>
+                            <button class="tab-btn" data-filter="rank-3">Tam Chuyển</button>
+                            <button class="tab-btn" data-filter="rank-4">Tứ Chuyển</button>
+                            <button class="tab-btn" data-filter="rank-5">Ngũ Chuyển</button>
+                            <button class="tab-btn" data-filter="immortal">Tiên Cổ (6–9 Chuyển)</button>
+                        </div>
+                    </div>
+
+                    <div class="equipped-loadout-banner">
+                        <span><strong>8 Ô Cổ Trùng Xuất Chiến:</strong> (Nhấn vào Cổ Trùng bên dưới để gán ô)</span>
+                        <div id="hub-equipped-gu-bar" class="slot-grid-8"></div>
+                    </div>
+
+                    <div class="split-2 mt-15">
+                        <div class="card-box">
+                            <h3>Danh Sách Cổ Trùng Đang Sở Hữu</h3>
+                            <div id="gu-storage-grid" class="item-grid"></div>
+                        </div>
+                        <div class="card-box">
+                            <h3>Chi Tiết Cổ Trùng, Thăng Chuyển & Nuôi Dưỡng</h3>
+                            <div id="gu-detail-box" class="detail-card">
+                                <p class="empty-hint">Chọn một Cổ Trùng bên trái để xem thực đơn thức ăn, Thăng Chuyển trực tiếp, luyện hóa hoặc gán vào 8 ô chiến đấu.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =========================================================
+                     TAB 4: LUYỆN ĐẠO CÁC — LUYỆN HÓA & HỢP LUYỆN CỔ
+                ========================================================== -->
+                <section id="tab-refinement" class="hub-tab-panel hidden">
+                    <div class="panel-header">
+                        <h2>⚗️ Luyện Đạo Các — Hợp Luyện Cổ & Suy Diễn Cổ Phương</h2>
+                        <p class="sub-text">Kết hợp các Cổ Trùng và Cổ Tài theo đúng Bí Phương hoặc đặt 1 Cổ Trùng kèm thức ăn của nó để Thăng Chuyển.</p>
+                    </div>
+
+                    <div class="split-2">
+                        <div class="card-box">
+                            <h3>Đỉnh Lò Hợp Luyện</h3>
+                            <div class="refinement-slots">
+                                <div class="refine-slot" id="refine-slot-1">Cổ Trùng 1</div>
+                                <span class="plus-sign">+</span>
+                                <div class="refine-slot" id="refine-slot-2">Cổ Trùng 2 / Phụ Liệu</div>
+                                <span class="plus-sign">+</span>
+                                <div class="refine-slot" id="refine-slot-3">Cổ Tài Phụ Trợ</div>
+                            </div>
+
+                            <div id="refinement-recipe-preview" class="recipe-preview-box">
+                                <p>Cổ Phương khớp: <strong>Chưa chọn nguyên liệu</strong></p>
+                                <p>Tỷ lệ thành công: <strong>0%</strong> (Cộng thêm từ Đạo Ngân Luyện Đạo & Trí Đạo)</p>
+                                <p>Chi phí: <strong>0% Chân Nguyên | 0 Nguyên Thạch</strong></p>
+                            </div>
+
+                            <div class="action-row">
+                                <button id="btn-execute-refinement" class="btn-primary" disabled>🔥 Khởi Lò Hợp Luyện</button>
+                                <button id="btn-clear-refinement" class="btn-secondary">Bỏ Chọn</button>
+                                <button id="btn-study-remnant-recipe" class="btn-accent">📜 Giải Mã Tàn Phương (Tốn 1 Tàn Quyển)</button>
+                            </div>
+                        </div>
+
+                        <div class="card-box">
+                            <h3>Bí Phương Hợp Luyện Đã Lĩnh Ngộ (Nhấn để tự động đặt vào lò)</h3>
+                            <ul id="known-recipes-list" class="recipe-list"></ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =========================================================
+                     TAB 5: THIÊN CƠ SÁT CHIÊU (Z, X, C, V)
+                ========================================================== -->
+                <section id="tab-killer-moves" class="hub-tab-panel hidden">
+                    <div class="panel-header">
+                        <h2>⚡ Thiên Cơ Đường — Thôi Diễn Phàm Đạo & Tiên Đạo Sát Chiêu</h2>
+                        <p class="sub-text">"Cổ trùng là điểm, Sát chiêu là diện." Khi bạn Thăng Chuyển cho Cổ Trùng trong Kho Cổ, Sát Chiêu tương ứng cũng tự động tăng Chuyển và Uy Lực!</p>
+                    </div>
+
+                    <div class="split-2">
+                        <div class="card-box">
+                            <h3>Thôi Diễn Sát Chiêu Mới</h3>
+                            <div class="composer-slots">
+                                <div class="k-slot-box">
+                                    <label>1. Cổ Cốt Lõi (Core Gu):</label>
+                                    <select id="killer-core-select"></select>
+                                </div>
+                                <div class="k-slot-box">
+                                    <label>2. Cổ Phụ Trợ I:</label>
+                                    <select id="killer-sub1-select"></select>
+                                </div>
+                                <div class="k-slot-box">
+                                    <label>3. Cổ Phụ Trợ II (Tùy chọn):</label>
+                                    <select id="killer-sub2-select"></select>
+                                </div>
+                            </div>
+
+                            <div id="killer-deduction-preview" class="deduction-box">
+                                <p>Tên Sát Chiêu: <strong id="deduce-name" class="highlight-gold">---</strong></p>
+                                <p>Phân loại: <strong id="deduce-type">---</strong></p>
+                                <p>Tiêu hao: <strong id="deduce-cost">0</strong></p>
+                                <p>Mô tả vận hành: <span id="deduce-desc">Hãy chọn các cổ trùng đã luyện hóa để kiểm tra xung đột đạo ngân.</span></p>
+                            </div>
+
+                            <button id="btn-deduce-killer-move" class="btn-primary">☯️ Thôi Diễn & Lưu Sát Chiêu</button>
+                        </div>
+
+                        <div class="card-box">
+                            <h3>Sát Chiêu Đã Nắm Giữ & Gán Phím (Z, X, C, V)</h3>
+                            <div id="saved-killer-moves-list" class="scroll-list"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =========================================================
+                     TAB 6: ĐẠO NGÂN, LƯU PHÁI & THĂM DÒ MỘNG CẢNH
+                ========================================================== -->
+                <section id="tab-dao-attainment" class="hub-tab-panel hidden">
+                    <div class="panel-header">
+                        <h2>🌌 Đạo Ngân & Cảnh Giới Lĩnh Ngộ Lưu Phái</h2>
+                        <p class="sub-text">Mỗi 100 Đạo Ngân cùng lưu phái tăng +10% uy lực cổ thuật. Cảnh giới đạt Tông Sư có thể lấy pháp tự nhiên, Đại Tông Sư mô phỏng lưu phái khác.</p>
+                    </div>
+
+                    <div class="split-2">
+                        <div class="card-box">
+                            <h3>21 Con Đường Tu Luyện (Đạo Ngân & Cảnh Giới)</h3>
+                            <div id="dao-marks-list" class="dao-marks-grid"></div>
+                        </div>
+
+                        <div class="card-box">
+                            <h3>🌙 Thăm Dò Mộng Cảnh Thượng Cổ</h3>
+                            <p class="sub-text">Trong Mộng Cảnh ẩn chứa chân ý của các bậc Tiên Tôn, Ma Tôn. Thăm dò thành công giúp tăng vọt Cảnh Giới Lưu Phái và Nhân Khí, nhưng rất tốn Tinh Thần Lực.</p>
+                            <div id="dream-realm-list" class="scroll-list mt-15"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =========================================================
+                     TAB 7: HÀNH TRANG, XÁ LỢI CỔ & CỔ TÀI
+                ========================================================== -->
+                <section id="tab-inventory" class="hub-tab-panel hidden">
+                    <div class="panel-header">
+                        <h2>🎒 Hành Trang & Kho Chứa Cổ Tài</h2>
+                        <p class="sub-text">Quản lý Xá Lợi Cổ, Cổ Phương Tàn Quyển, thảo dược trị thương và nguyên liệu cho Cổ Trùng ăn.</p>
+                    </div>
+
+                    <div class="split-2">
+                        <div class="card-box">
+                            <h3>Vật Phẩm Trong Túi</h3>
+                            <div id="inventory-grid" class="item-grid"></div>
+                        </div>
+                        <div class="card-box">
+                            <h3>Chi Tiết & Sử Dụng Vật Phẩm</h3>
+                            <div id="inventory-detail-box" class="detail-card">
+                                <p class="empty-hint">Chọn một vật phẩm bên trái để sử dụng hoặc bán đổi Nguyên Thạch.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =========================================================
+                     TAB 8: THƯƠNG HỘI PHÀM NHÂN & BẢO HOÀNG THIÊN
+                ========================================================== -->
+                <section id="tab-market" class="hub-tab-panel hidden">
+                    <div class="panel-header">
+                        <div>
+                            <h2>⚖️ Giao Dịch Thương Đội & Bảo Hoàng Thiên</h2>
+                            <p class="sub-text">Mua thức ăn nuôi cổ tại Thương Đội, tranh giá Xá Lợi Cổ tại Đấu Giá Trường, hoặc dùng Thông Thiên Cổ kết nối Bảo Hoàng Thiên.</p>
+                        </div>
+                        <div class="filter-tabs" id="market-subtabs">
+                            <button class="tab-btn active" data-market="caravan">🐪 Thương Đội Ngũ Vực</button>
+                            <button class="tab-btn" data-market="auction">🔨 Phòng Đấu Giá Lớn</button>
+                            <button class="tab-btn" data-market="treasure_heaven">🌟 Bảo Hoàng Thiên (Tiên Thị)</button>
+                        </div>
+                    </div>
+
+                    <div id="market-content-container" class="market-container">
+                        <!-- Render động bởi UIManager -->
+                    </div>
+                </section>
+
+                <!-- =========================================================
+                     TAB 9: THẾ LỰC ĐƯỜNG, KHỐ PHÒNG & CHÂN TRUYỀN
+                ========================================================== -->
+                <section id="tab-faction" class="hub-tab-panel hidden">
+                    <div class="panel-header">
+                        <h2>🏯 Thế Lực Đường — Nhiệm Vụ, Khố Phòng & Cơ Duyên Chân Truyền</h2>
+                        <p class="sub-text">Hoàn thành ủy thác để nhận Nguyên Thạch và Điểm Cống Hiến, dùng đổi Cổ Trùng quý trong Gia Tộc Khố Phòng.</p>
+                    </div>
+
+                    <div class="split-3">
+                        <div class="card-box">
+                            <h3>📜 Bảng Ủy Thác Nhiệm Vụ</h3>
+                            <div id="quest-list-container" class="scroll-list"></div>
+                        </div>
+                        <div class="card-box">
+                            <h3>🏛️ Gia Tộc Khố Phòng (Đổi Cống Hiến)</h3>
+                            <div id="clan-treasury-container" class="scroll-list"></div>
+                        </div>
+                        <div class="card-box">
+                            <h3>🕯️ Manh Mối Chân Truyền Thượng Cổ</h3>
+                            <div id="inheritance-list-container" class="scroll-list"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =========================================================
+                     TAB 10: LƯU TRỮ 3 Ô, XUẤT/NHẬP FILE (.JSON) & CÀI ĐẶT
+                ========================================================== -->
+                <section id="tab-settings" class="hub-tab-panel hidden">
+                    <div class="panel-header">
+                        <h2>💾 Hệ Thống Lưu Trữ, Sao Lưu File (.json) & Thiết Lập Điều Khiển</h2>
+                    </div>
+
+                    <div class="split-2">
+                        <div class="card-box">
+                            <h3>Lưu / Tải Trên Trình Duyệt (LocalStorage)</h3>
+                            <div class="save-slots-container">
+                                <div class="save-slot-card">
+                                    <div>
+                                        <strong>Ô Lưu 1 (Tự động & Thủ công)</strong>
+                                        <p id="save-slot-1-info" class="sub-text">Chưa có dữ liệu</p>
+                                    </div>
+                                    <div class="save-actions">
+                                        <button class="btn-mini btn-save-slot" data-slot="1">Lưu</button>
+                                        <button class="btn-mini btn-load-slot" data-slot="1">Tải</button>
+                                    </div>
+                                </div>
+                                <div class="save-slot-card">
+                                    <div>
+                                        <strong>Ô Lưu 2</strong>
+                                        <p id="save-slot-2-info" class="sub-text">Chưa có dữ liệu</p>
+                                    </div>
+                                    <div class="save-actions">
+                                        <button class="btn-mini btn-save-slot" data-slot="2">Lưu</button>
+                                        <button class="btn-mini btn-load-slot" data-slot="2">Tải</button>
+                                    </div>
+                                </div>
+                                <div class="save-slot-card">
+                                    <div>
+                                        <strong>Ô Lưu 3</strong>
+                                        <p id="save-slot-3-info" class="sub-text">Chưa có dữ liệu</p>
+                                    </div>
+                                    <div class="save-actions">
+                                        <button class="btn-mini btn-save-slot" data-slot="3">Lưu</button>
+                                        <button class="btn-mini btn-load-slot" data-slot="3">Tải</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h3 class="mt-15">📦 Xuất / Nhập File Lưu Trữ (.json)</h3>
+                            <p class="sub-text">Tải tiến trình hiện tại về máy tính dưới dạng file <code>.json</code> để cất giữ an toàn hoặc chuyển sang máy/trình duyệt khác chơi tiếp.</p>
+                            <div class="action-row mt-10">
+                                <button id="btn-export-save-file" class="btn-primary">⬇️ Xuất File Lưu Về Máy (.json)</button>
+                                <button id="btn-import-save-file" class="btn-accent">⬆️ Nhập File Lưu Từ Máy (.json)</button>
+                            </div>
+
+                            <button id="btn-reset-all-saves" class="btn-danger mt-15">🗑️ Xóa Toàn Bộ Lưu Trữ Trình Duyệt</button>
+                        </div>
+
+                        <div class="card-box">
+                            <h3>Hướng Dẫn Điều Khiển Khi Vào Bản Đồ Chiến Đấu</h3>
+                            <div class="form-group">
+                                <label for="keybind-mode-select">Chế độ kích hoạt 8 Ô Cổ Trùng:</label>
+                                <select id="keybind-mode-select">
+                                    <option value="hybrid">Kết hợp: Phím 1–8 hoặc Q, R, T, F</option>
+                                    <option value="numbers">Chỉ dùng phím số 1–8</option>
+                                </select>
+                            </div>
+                            <ul class="keybind-guide-list">
+                                <li><strong>W, A, S, D:</strong> Di chuyển Cổ Sư trên chiến trường mở rộng 4800×4800px</li>
+                                <li><strong>Phím Space hoặc Chuột Phải:</strong> Thi triển Phá Không Thân Pháp (Lướt Tàn Ảnh né Sát Chiêu của Boss / Song Tôn)</li>
+                                <li><strong>Giữ Shift:</strong> Chạy nhanh</li>
+                                <li><strong>Phím 1–8 (hoặc Q, R, T, F):</strong> Thúc giục 8 Ô Cổ Trùng theo hướng con trỏ chuột</li>
+                                <li><strong>Phím Z, X, C, V:</strong> Thi triển 4 Ô Sát Chiêu</li>
+                                <li><strong>Phím E:</strong> Giao lưu/Giao dịch với NPC Cổ Sư, Thu thập Cổ Tài hoặc Trấn áp Cổ Hoang Dã</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+
+            <!-- CỘT PHẢI: NHẬT KÝ TU LUYỆN & BIẾN ĐỘNG NGŨ VỰC -->
+            <aside class="hub-right-log">
+                <div class="log-header">
+                    <span>📜 Thiên Cơ Nhật Ký</span>
+                    <button id="btn-clear-log" class="btn-mini">Xóa</button>
+                </div>
+                <div id="world-log-content" class="log-messages">
+                    <div class="log-entry system">[Hệ thống] Chào mừng đạo hữu tiến vào Đại Bản Doanh Vạn Cổ Tiên Đồ.</div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- =================================================================
+         MÀN HÌNH 3: CHIẾN ĐẤU TRONG BẢN ĐỒ VƯỢT ẢI 2D (STAGE BATTLE SCREEN)
+    ================================================================== -->
+    <div id="battle-screen" class="screen">
+        <canvas id="gameCanvas"></canvas>
+
+        <div id="battle-hud-overlay">
+            <!-- Góc trên trái: Máu, Chân Nguyên & Trạng thái Cổ Sư -->
+            <div class="battle-hud-top-left hud-panel">
+                <div class="battle-header-row">
+                    <strong id="battle-player-name" class="highlight-gold">Phương Nguyên</strong>
+                    <span id="battle-realm-badge" class="badge">Nhất Chuyển Sơ Giai</span>
+                </div>
+
+                <div class="stat-bar-group">
+                    <div class="stat-label">
+                        <span>Sinh Mệnh (HP)</span>
+                        <span id="battle-hp-text">100 / 100</span>
+                    </div>
+                    <div class="progress-track">
+                        <div id="battle-hp-fill" class="progress-fill hp-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+
+                <div class="stat-bar-group">
+                    <div class="stat-label">
+                        <span id="battle-essence-name">Thanh Đồng Chân Nguyên</span>
+                        <span id="battle-essence-text">72% / 72%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div id="battle-essence-cap-marker" class="essence-cap-marker" style="left: 72%;"></div>
+                        <div id="battle-essence-fill" class="progress-fill essence-rank-1" style="width: 72%;"></div>
+                    </div>
+                </div>
+
+                <div id="battle-active-buffs" class="active-buffs-row"></div>
+            </div>
+
+            <!-- Chính giữa trên: Thông tin Ải Hiện Tại, Tiến độ Diệt Quái / Boss -->
+            <div class="battle-hud-top-center hud-panel">
+                <h3 id="battle-stage-title">Ải 1: Sườn Núi Thanh Mao</h3>
+                <p id="battle-stage-objective" class="sub-text">Mục tiêu: Tiêu diệt 0/8 Điện Lang để dẫn dụ Bách Thú Vương xuất hiện</p>
+                <div class="progress-track mt-5">
+                    <div id="battle-stage-progress-fill" class="progress-fill cultivation-fill" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <!-- Góc trên phải: Minimap Ải & Nút Rút Lui Về Menu Đại Bản Doanh -->
+            <div class="battle-hud-top-right">
+                <div class="hud-panel minimap-panel">
+                    <canvas id="minimapCanvas" width="140" height="140"></canvas>
+                </div>
+                <button id="btn-retreat-to-hub" class="btn-danger">🏃 Rút Lui Về Đại Bản Doanh</button>
+            </div>
+
+            <!-- Chính giữa dưới: Thanh 8 Ô Cổ Trùng + 4 Ô Sát Chiêu + Dùng Nguyên Thạch Nhanh -->
+            <div class="battle-hud-bottom-center">
+                <div id="interaction-prompt" class="interaction-banner hidden">
+                    Nhấn <span class="key-badge">E</span> để giao lưu NPC / thu thập Cổ Tài
+                </div>
+
+                <div class="combat-bars-wrapper">
+                    <div class="hotbar-section">
+                        <div class="hotbar-title">Cổ Trùng Xuất Chiến (1–8 / Q,R,T,F)</div>
+                        <div id="gu-quickbar" class="slot-grid-8">
+                            <div class="skill-slot gu-slot" data-slot="0"><span class="slot-key" id="key-label-gu-0">1/Q</span><div class="slot-icon"></div><span class="slot-cost"></span><div class="cooldown-overlay"></div><div class="no-essence-overlay hidden">Cạn</div></div>
+                            <div class="skill-slot gu-slot" data-slot="1"><span class="slot-key" id="key-label-gu-1">2</span><div class="slot-icon"></div><span class="slot-cost"></span><div class="cooldown-overlay"></div><div class="no-essence-overlay hidden">Cạn</div></div>
+                            <div class="skill-slot gu-slot" data-slot="2"><span class="slot-key" id="key-label-gu-2">3/R</span><div class="slot-icon"></div><span class="slot-cost"></span><div class="cooldown-overlay"></div><div class="no-essence-overlay hidden">Cạn</div></div>
+                            <div class="skill-slot gu-slot" data-slot="3"><span class="slot-key" id="key-label-gu-3">4/T</span><div class="slot-icon"></div><span class="slot-cost"></span><div class="cooldown-overlay"></div><div class="no-essence-overlay hidden">Cạn</div></div>
+                            <div class="skill-slot gu-slot" data-slot="4"><span class="slot-key" id="key-label-gu-4">5</span><div class="slot-icon"></div><span class="slot-cost"></span><div class="cooldown-overlay"></div><div class="no-essence-overlay hidden">Cạn</div></div>
+                            <div class="skill-slot gu-slot" data-slot="5"><span class="slot-key" id="key-label-gu-5">6</span><div class="slot-icon"></div><span class="slot-cost"></span><div class="cooldown-overlay"></div><div class="no-essence-overlay hidden">Cạn</div></div>
+                            <div class="skill-slot gu-slot" data-slot="6"><span class="slot-key" id="key-label-gu-6">7</span><div class="slot-icon"></div><span class="slot-cost"></span><div class="cooldown-overlay"></div><div class="no-essence-overlay hidden">Cạn</div></div>
+                            <div class="skill-slot gu-slot" data-slot="7"><span class="slot-key" id="key-label-gu-7">8/F</span><div class="slot-icon"></div><span class="slot-cost"></span><div class="cooldown-overlay"></div><div class="no-essence-overlay hidden">Cạn</div></div>
+                        </div>
+                    </div>
+
+                    <div class="hotbar-section killer-bar-section">
+                        <div class="hotbar-title">Sát Chiêu (Z X C V)</div>
+                        <div id="killer-quickbar" class="slot-grid-4">
+                            <div class="skill-slot killer-slot" data-kslot="0"><span class="slot-key">Z</span><div class="slot-icon"></div><span class="slot-cost"></span><div class="cooldown-overlay"></div></div>
+                            <div class="skill-slot killer-slot" data-kslot="1"><span class="slot-key">X</span><div class="slot-icon"></div><span class="slot-cost"></span><div class="cooldown-overlay"></div></div>
+                            <div class="skill-slot killer-slot" data-kslot="2"><span class="slot-key">C</span><div class="slot-icon"></div><span class="slot-cost"></span><div class="cooldown-overlay"></div></div>
+                            <div class="skill-slot killer-slot" data-kslot="3"><span class="slot-key">V</span><div class="slot-icon"></div><span class="slot-cost"></span><div class="cooldown-overlay"></div></div>
+                        </div>
+                    </div>
+
+                    <div class="hotbar-section quick-cultivate-section">
+                        <button id="btn-battle-use-stone" class="btn-stone" title="Hấp thu 1 Nguyên Thạch hồi nhanh Chân Nguyên trong trận">
+                            💎 Hồi Nguyên
+                        </button>
+                        <button id="btn-battle-use-herb" class="btn-cultivate" title="Dùng Thảo Dược hồi máu nhanh">
+                            🌿 Trị Thương
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bảng Tương Tác NPC Cổ Sư Trong Bản Đồ Chiến Đấu -->
+        <div id="npc-interaction-modal" class="modal-backdrop hidden">
+            <div class="modal-window" style="max-width: 580px;">
+                <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;">
+                    <h2 id="npc-modal-title">🤝 Giao Lưu Cổ Sư</h2>
+                    <button id="btn-close-npc-modal" class="btn-mini">✕ Đóng</button>
+                </div>
+                <div class="modal-body" id="npc-modal-body"></div>
+            </div>
+        </div>
+
+        <!-- Bảng Tổng Kết Chiến Lợi Phẩm Khi Vượt Ải Thành Công -->
+        <div id="stage-victory-modal" class="modal-backdrop hidden">
+            <div class="modal-window" style="max-width: 520px;">
+                <div class="modal-header">
+                    <h2 id="stage-result-title">🎉 Chinh Phạt Bản Đồ Thành Công!</h2>
+                </div>
+                <div class="modal-body">
+                    <div id="stage-reward-summary" class="recipe-preview-box"></div>
+                    <div class="action-row mt-15" style="justify-content: flex-end;">
+                        <button id="btn-replay-stage" class="btn-secondary">🔄 Cày Lại Bản Đồ Này</button>
+                        <button id="btn-victory-return-hub" class="btn-primary">🏯 Trở Về Đại Bản Doanh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NẠP CÁC MODULE JAVASCRIPT -->
+    <script src="js/ApertureSystem.js"></script>
+    <script src="js/PlayerManager.js"></script>
+    <script src="js/MapManager.js"></script>
+    <script src="js/UIManager.js"></script>
+    <script src="js/GuSystem.js"></script>
+    <script src="js/CombatSystem.js"></script>
+    <script src="js/EnemyManager.js"></script>
+    <script src="js/GameEngine.js"></script>
+</body>
+</html>
